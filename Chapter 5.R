@@ -65,3 +65,141 @@ rename(flights, tail_num = tailnum)
 select(flights, time_hour, air_time, everything())
 
 # End of section 5.4
+
+flights_sml <- select(flights,
+                      year:day,
+                      ends_with("delay"),
+                      distance, 
+                      air_time
+                )
+# Use mutate to add new rows
+
+mutate(flights_sml,
+       gain = dep_delay - arr_delay,
+       speed = distance / air_time * 60
+       )
+
+mutate(flights_sml,
+       gain = dep_delay - arr_delay,
+       hours = air_time / 60,
+       gain_per_hour = gain / hours
+       )
+
+# Only keep the new variables
+
+transmute(flights,
+          gain = dep_delay - arr_delay,
+          hours = air_time / 60,
+          gain_per_hour = gain / hours
+          )
+
+transmute(flights,
+          dep_time,
+          hour = dep_time %/% 100, # Integer division
+          minute = dep_time %% 100 # remainder
+          )
+
+x <- 1:10
+lag(x)
+lead(x)
+
+# Cumulative aggregates
+# Use RcppRoll package for rolling aggregates
+x
+cumsum(x)
+cummean(x)
+
+y <- c(1, 2, 2, NA, 3, 4)
+min_rank(y)
+min_rank(desc(y))
+
+row_number(y)
+dense_rank(y)
+percent_rank(y)
+cume_dist(y)
+
+transmute(flights,
+          dep_time,
+          dep_time_since_mid = ((dep_time %/% 100) * 60) + (dep_time %% 100) %% 1440)
+
+transmute(flights,
+          air_time,
+          dep_time_since_mid = ((dep_time %/% 100) * 60) + (dep_time %% 100) %% 1440,
+          arr_time_since_mid = ((arr_time %/% 100) * 60) + (arr_time %% 100) %% 1440,
+          real_time = arr_time_since_mid - dep_time_since_mid)
+
+flights_airtime <-
+  mutate(flights,
+         dep_time = (dep_time %/% 100 * 60 + dep_time %% 100) %% 1440,
+         arr_time = (arr_time %/% 100 * 60 + arr_time %% 100) %% 1440,
+         air_time_diff = air_time - arr_time + dep_time
+  )
+
+nrow(filter(flights_airtime, air_time_diff != 0))
+
+#Summarize data
+summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
+
+by_day <- group_by(flights, year, month, day)
+summarise(by_day, delay = mean(dep_delay, na.rm = TRUE))
+
+# Without the pipe function
+by_dest <- group_by(flights, dest)
+delay <- summarise(by_dest,
+                   count = n(),
+                   dist = mean(distance, na.rm = TRUE),
+                   delay = mean(arr_delay, na.rm = TRUE)
+)
+#> `summarise()` ungrouping output (override with `.groups` argument)
+delay <- filter(delay, count > 20, dest != "HNL")
+
+# It looks like delays increase with distance up to ~750 miles 
+# and then decrease. Maybe as flights get longer there's more 
+# ability to make up delays in the air?
+ggplot(data = delay, mapping = aes(x = dist, y = delay)) +
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+#> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+#> 
+# Using the pipe
+delays <- flights %>%
+  group_by(dest) %>%
+  summarise(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>%
+  filter(count > 20, dest != "HNL")
+
+not_cancelled <- flights %>%
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(mean = mean(dep_delay))
+
+delays <- not_cancelled %>%
+  group_by(tailnum) %>%
+  summarise(
+    delay = mean(arr_delay)
+  )
+
+ggplot(data = delays, mapping = aes(x = delay)) +
+  geom_freqpoly(binwidth = 10)
+
+delays <- not_cancelled %>%
+  group_by(tailnum) %>%
+  summarise(
+    delay = mean(arr_delay, na.rm = TRUE),
+    n = n()
+  )
+
+ggplot(data = delays, mapping  = aes(x = n, y = delay)) +
+  geom_point(alpha = 1/10)
+
+delays %>%
+  filter(n > 25) %>%
+  ggplot(mapping = aes(x = n, y = delay)) +
+  geom_point(alpha = 1/10)
+
+# Start with lahman package 5.6.3
