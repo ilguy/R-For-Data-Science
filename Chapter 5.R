@@ -203,3 +203,114 @@ delays %>%
   geom_point(alpha = 1/10)
 
 # Start with lahman package 5.6.3
+
+delays <- not_cancelled %>%
+  group_by(tailnum) %>%
+  summarise(
+    delay = mean(arr_delay)
+  )
+
+ggplot(data = delays, mapping = aes(x = delay)) +
+  geom_freqpoly(binwidth = 10)
+
+batting <- as_tibble(Lahman::Batting)
+
+batters <- batting %>%
+  group_by(playerID) %>%
+  summarise(
+    ba = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE),
+    ab = sum(AB, na.rm = TRUE)
+  )
+
+batters %>%
+  filter(ab > 100) %>%
+  ggplot(mapping = aes(x = ab, y = ba)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+batters %>%
+  arrange(desc(ba))
+
+# 5.6.4
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(
+    avg_delay1 = mean(arr_delay),
+    avg_delay2 = mean(arr_delay[arr_delay > 0])
+  )
+
+not_cancelled %>%
+  group_by(dest) %>%
+  summarise(distance_sd = sd(distance)) %>%
+  arrange(desc(distance_sd))
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(
+    first = min(dep_time),
+    last = max(dep_time)
+  )
+
+# Same but with first and last
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(
+    first_dep = first(dep_time),
+    last_dep = last(dep_time)
+  )
+
+# Filtering with ranks
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  mutate(r = min_rank(desc(dep_time))) %>%
+  filter(r %in% range(r))
+
+not_cancelled %>%
+  group_by(dest) %>%
+  summarise(carriers = n_distinct(carrier)) %>%
+  arrange(desc(carriers))
+
+# Simple count
+not_cancelled %>%
+  count(dest)
+
+# Use weight in count, this one counts miles a plane flew
+not_cancelled %>%
+  count(tailnum, wt = distance) %>%
+  arrange(desc(n))
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(n_early = sum(dep_time < 500))
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarise(hour_prop = mean(arr_delay > 60))
+
+# 5.6.5
+daily <- group_by(flights, year, month, day)
+(per_day <- summarise(daily, flights = n()))
+(per_month <- summarise(per_day, flights = sum(flights)))
+(per_year <- summarise(per_month, flights = sum(flights)))
+
+# 5.6.6
+daily %>%
+  ungroup() %>%
+  summarise(flights = n())
+
+# 5.7
+flights_sml %>%
+  group_by(year, month, day) %>%
+  filter(rank(desc(arr_delay)) < 10)
+
+popular_dests <- flights %>%
+  group_by(dest) %>%
+  filter(n() > 365)
+popular_dests
+
+popular_dests %>%
+  filter(arr_delay > 0) %>%
+  mutate(prop_delay = arr_delay / sum(arr_delay)) %>%
+  select(year:day, dest, arr_delay, prop_delay)
+
+# End of Chapter 5
