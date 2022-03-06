@@ -121,3 +121,18 @@ ggplot(data = smaller, mapping = aes(x = carat, y = price)) +
 
 ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
   geom_boxplot(mapping = aes(group = cut_number(carat, 20)))
+
+ggplot(data = faithful) +
+  geom_point(mapping = aes(x = eruptions, y = waiting))
+
+library(modelr)
+mod <- lm(log(price) ~ log(carat), data = diamonds)
+diamonds2 <- diamonds %>%
+  add_residuals(mod) %>%
+  mutate(resid = exp(resid))
+
+ggplot(data = diamonds2) +
+  geom_point(mapping = aes(x = carat, y = resid))
+
+ggplot(data = diamonds2) +
+  geom_boxplot(mapping = aes(x = cut, y = resid))
