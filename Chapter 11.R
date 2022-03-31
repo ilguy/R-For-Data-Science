@@ -19,3 +19,12 @@ read_csv("1,2,3\n4,5,6", col_names = c("x", "y", "z"))
 read_csv("a,b,c\n1,2,.", na = ".")
 
 #11.3
+str(parse_logical(c("TRUE", "FALSE", "NA")))
+
+str(parse_integer(c("1", "2", "3")))
+
+str(parse_date(c("2010-01-01", "1979-10-14")))
+
+parse_integer(c("1", "231", ".", "456"), na = ".")
+
+x <- parse_integer(c("123", "345", "abc", "123.45"))
