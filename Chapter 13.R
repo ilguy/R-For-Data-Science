@@ -73,4 +73,75 @@ y <- tribble(
   3, "y4"
 )
 left_join(x, y, by = "key")
- 
+
+x <- tribble(
+  ~key, ~val_x,
+  1, "x1",
+  2, "x2",
+  2, "x3",
+  3, "x4"
+)
+
+y <- tribble(
+  ~key, ~val_y,
+  1, "y1",
+  2, "y2",
+  2, "y3",
+  3, "y4"
+)
+
+left_join(x,y,by = 'key')
+
+flights %>%
+  left_join(weather)
+
+flights2 %>%
+  left_join(planes, by = 'tailnum')
+
+flights2 %>%
+  left_join(airports, c("dest" = "faa"))
+
+flights2 %>%
+  left_join(airports, c('origin' = 'faa'))
+
+airports %>%
+  semi_join(flights, c("faa" = "dest")) %>%
+  ggplot(aes(lon, lat)) +
+  borders("state") +
+  geom_point() +
+  coord_quickmap()
+
+top_dest <- flights %>%
+  count(dest, sort = TRUE) %>%
+  head(10)
+top_dest
+
+flights %>%
+  filter(dest %in% top_dest$dest)
+
+flights %>%
+  semi_join(top_dest)
+
+flights %>%
+  anti_join(planes, by = 'tailnum') %>%
+  count(tailnum, sort = TRUE)
+
+df1 <- tribble(
+  ~x, ~y,
+  1, 1,
+  2, 1
+)
+
+df2 <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, 2
+)
+
+intersect(df1, df2)
+
+union(df1, df2)
+
+setdiff(df1, df2)
+
+setdiff(df2, df1)
