@@ -32,3 +32,19 @@ str_c("|-", x, "-|")
 str_c("|-", str_replace_na(x), "-|")
 
 str_c("prefix-", c("a", "b", "c"), "-suffix")
+
+name <- "Hadley"
+time_of_day <- "morning"
+birthday <- TRUE
+
+str_c("Good ", time_of_day, " ", name,
+      if(birthday) " and HAPPY BIRTHDAY",
+      ".")
+
+str_c(c("x", "y", "z"), collapse = ", ")
+
+# 14.2.3
+x <- c("Apple", "Banana", "Pear")
+str_sub(x, 1, 3)
+
+str_sub(x, -3, -1)
