@@ -48,3 +48,70 @@ x <- c("Apple", "Banana", "Pear")
 str_sub(x, 1, 3)
 
 str_sub(x, -3, -1)
+
+str_sub("a", 1, 5)
+
+str_sub(x, 1, 1) <- str_to_lower(str_sub(x, 1, 1))
+x
+
+# Turkish has two i's: with and without a dot, and it
+# has a different rule for capitalising them:
+str_to_upper(c("i", "ı"))
+
+str_to_upper(c("i", "ı"), locale = "tr")
+
+x <- c("apple", "eggplant", "banana")
+str_sort(x, locale = "en")
+
+str_sort(x, locale = "haw")
+
+x <- c("apple", "banana", "pear")
+str_view(x, "an")
+
+str_view(x, ".a.")
+dot <- "\\."
+
+writeLines(dot)
+
+str_view(c("abc", "a.c", "bef"), "a\\.c")
+
+x <- "a\\b"
+
+writeLines(x)
+
+str_view(x, "\\\\")
+
+x <- c("apple", "banana", "pear")
+str_view(x, "^a")
+
+str_view(x, "a$")
+
+x <- c("apple pie", "apple", "apple cake")
+str_view(x, "apple")
+
+str_view(x, "^apple$")
+
+str_view(c("abc", "a.c", "a*c", "a c"), "a[.]c")
+
+str_view(c("abc", "a.c", "a*c", "a c"), ".[*]c")
+
+str_view(c("abc", "a.c", "a*c", "a c"), "a[ ]")
+
+str_view(c("grey", "gray"), "gr(e|a)y")
+x <- "1888 is the longest year in Roman numerals: MDCCCLXXXVIII"
+str_view(x, "CC?")
+str_view(x, "CC+")
+str_view(x, 'C[LX]+')
+
+str_view(x, "C{2}")
+
+str_view(x, "C{2,}")
+
+str_view(x, "C{2,3}")
+
+str_view(x, 'C{2,3}?')
+str_view(x, 'C[LX]+?')
+
+str_view(fruit, "(..)\\1", match = TRUE)
+
+# 14.4
