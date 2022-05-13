@@ -115,3 +115,42 @@ str_view(x, 'C[LX]+?')
 str_view(fruit, "(..)\\1", match = TRUE)
 
 # 14.4
+x <- c("apple", "banana", "pear")
+str_detect(x, "e")
+
+sum(str_detect(words, "^t"))
+mean(str_detect(words, "[aeiou]$"))
+
+no_vowels_1 <- !str_detect(words, "[aeiou]")
+
+no_vowels_2 <- str_detect(words, "^[^aeiou]+$")
+
+identical(no_vowels_1, no_vowels_2)
+
+words[str_detect(words, "x$")]
+
+str_subset(words, "x$")
+
+df <- tibble(
+  word = words,
+  i = seq_along(word)
+)
+df %>%
+  filter(str_detect(word, "x$"))
+
+x <- c("apple", "banana", "pear")
+str_count(x, "a")
+
+mean(str_count(words, "[aeiou]"))
+
+df %>% 
+  mutate(
+    vowels = str_count(word, "[aeiou]"),
+    consonants = str_count(word, "[^aeiou]")
+  )
+
+str_count("abababa", "aba")
+
+str_view_all("abababa", "aba")
+
+#14.4.2
